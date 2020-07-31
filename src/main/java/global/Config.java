@@ -1,3 +1,7 @@
+package global;
+
+import core.XSocket;
+
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,6 +29,6 @@ public class Config {
      * race safely
      */
     public static String getXSocketId() {
-        return "XSocket@" + COUNT.getAndIncrement();
+        return "core.XSocket@" + COUNT.getAndIncrement();
     }
 }

@@ -1,3 +1,7 @@
+package core;
+
+import core.XBuffer;
+import global.Config;
 import lombok.Data;
 
 import java.nio.channels.SocketChannel;
@@ -14,10 +18,18 @@ public class XSocket {
 
     private SocketChannel sc;
 
+    private XBuffer readBuffer;
+
+    private XBuffer writeBuffer;
+
+
     public XSocket(SocketChannel sc) {
         this.sc = sc;
 
-        xSocketId = Config.getXSocketId();
+        this.xSocketId = Config.getXSocketId();
+        this.readBuffer = new XBuffer();
+        this.writeBuffer = new XBuffer();
+
     }
 
 }

@@ -1,3 +1,8 @@
+package core;
+
+import core.XSocket;
+import global.Config;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
@@ -15,7 +20,7 @@ public class Acceptor implements Runnable {
 
     public Acceptor() throws IOException {
         this.ssc = ServerSocketChannel.open();
-        ssc.bind(new InetSocketAddress(Config.port));
+        ssc.bind(new InetSocketAddress(Config.PORT));
     }
 
     @Override
@@ -25,7 +30,7 @@ public class Acceptor implements Runnable {
                 SocketChannel sc = ssc.accept();
 
                 XSocket xSocket = new XSocket(sc);
-                Config.inboundQueue.offer(xSocket);
+                Config.INBOUND_QUEUE.offer(xSocket);
             } catch (IOException e) {
                 e.printStackTrace();
             }

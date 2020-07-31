@@ -1,6 +1,8 @@
 package core;
 
-import core.XBuffer;
+import codec.CodeCFactory;
+import codec.XReader;
+import codec.XWriter;
 import global.Config;
 import lombok.Data;
 
@@ -22,6 +24,14 @@ public class XSocket {
 
     private XBuffer writeBuffer;
 
+    /**
+     * common reader & writer -> should be adaptable for various protocols
+     **/
+    private XReader xReader;
+
+    private XWriter xWriter;
+
+    private boolean init;
 
     public XSocket(SocketChannel sc) {
         this.sc = sc;
@@ -30,6 +40,12 @@ public class XSocket {
         this.readBuffer = new XBuffer();
         this.writeBuffer = new XBuffer();
 
+        init = false;
+    }
+
+    public void initCodeC(CodeCFactory factory){
+        this.xReader = factory.createXReader();
+        this.xWriter =  factory.createXWriter();
     }
 
 }

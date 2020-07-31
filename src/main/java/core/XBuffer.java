@@ -9,13 +9,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @Author: Yukai
  * Description:
- * 缓存对象:
- *  考虑点 -> A.弹性 B 性能
+ * 一款简单的缓存设计:
+ * 考虑点 -> A.弹性 B.性能 C.竞争
  * @see java.nio.ByteBuffer to XBuffer
  * NIO 的特征: 每次读取的数据不一定能decode成一个完整的业务数据包(粘包....拆包....)
- * 使用每个channel维护 读 & 写 缓存的方式
+ * 使用每个channel维护 读 & 写 缓存的方式解决
  * 读:配合特定协议下的业务数据包检查组件 -> 反序列化业务数据包
  * 写:配合记录写位置的指针 -> 下一次写事件时resume上次步骤
+ *
+ * 安全 -> 扩展/释放
  * create time: 2020/7/31 15:07
  **/
 @Data

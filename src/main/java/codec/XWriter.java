@@ -11,5 +11,7 @@ import java.nio.ByteBuffer;
  * @author Master T
  */
 public interface XWriter {
+
     void write(ByteBuffer src, ByteBuffer desc);
+
 }

@@ -3,7 +3,6 @@ package codec;
 import core.XBuffer;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 /**
  * <p>
@@ -17,5 +16,4 @@ public interface XReader {
 
     void read(ByteBuffer src, XBuffer desc);
 
-    List<Request> getRequests();
 }

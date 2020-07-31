@@ -1,6 +1,5 @@
 package core;
 
-import core.XSocket;
 import global.Config;
 
 import java.io.IOException;

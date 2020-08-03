@@ -1,6 +1,9 @@
 package codec;
 
+import core.XBuffer;
+
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
 /**
  * <p>
@@ -12,6 +15,7 @@ import java.nio.ByteBuffer;
  */
 public interface XWriter {
 
-    void write(ByteBuffer src, ByteBuffer desc);
+    void write(ByteBuffer src, SocketChannel desc);
 
+    void enqueue(XBuffer xBuffer);
 }

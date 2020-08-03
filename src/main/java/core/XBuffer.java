@@ -23,10 +23,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Data
 public class XBuffer {
 
-    private final int READY = 0;
-
-    private final int PROCESSING = 1;
-
+    /**
+     * associated XSocketId
+     */
+    private String xSocketId;
     /**
      * internal content
      */
@@ -37,6 +37,12 @@ public class XBuffer {
      */
     private volatile int length;
 
+
+    /**************************STATUS*******************************************/
+    private final int READY = 0;
+
+    private final int PROCESSING = 1;
+
     /**
      * 0: ready for action
      * 1: in the processing of action
@@ -45,7 +51,7 @@ public class XBuffer {
 
 
     public XBuffer() {
-        content = new byte[Config.BUFFER_INITIAL_SIZE];
+        content = new byte[Config.X_BUFFER_INITIAL_SIZE];
         length = 0;
     }
 

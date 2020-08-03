@@ -1,5 +1,6 @@
 package global;
 
+import core.XBuffer;
 import core.XSocket;
 
 import java.util.Queue;
@@ -17,13 +18,15 @@ public class Config {
 
     public static final Queue<XSocket> INBOUND_QUEUE = new ArrayBlockingQueue<XSocket>(1024);
 
-    public static final Queue OUTBOUND_QUEUE = new ArrayBlockingQueue(1024);
+    public static final Queue<XBuffer> OUTBOUND_QUEUE = new ArrayBlockingQueue<XBuffer>(1024);
 
     public static int PORT = 8080;
 
     public static AtomicInteger COUNT = new AtomicInteger(0);
 
-    public static int BUFFER_INITIAL_SIZE = 4 * 1024; //4KB
+    public static int X_BUFFER_INITIAL_SIZE = 4 * 1024; //4KB
+
+    public static int BYTE_BUFFER_INITIAL_SIZE = 4 *1024; //4KB
 
     /**
      * race safely

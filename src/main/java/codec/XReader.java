@@ -3,6 +3,7 @@ package codec;
 import core.XBuffer;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * <p>
@@ -14,6 +15,7 @@ import java.nio.ByteBuffer;
  */
 public interface XReader {
 
-    void read(ByteBuffer src, XBuffer desc);
+    void read(ByteBuffer src);
 
+    List<XBuffer> getProtocolSpecialisedBufferBlocks();
 }

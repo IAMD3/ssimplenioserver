@@ -4,6 +4,7 @@ import com.sun.tools.javac.util.Assert;
 import global.Config;
 import lombok.Data;
 
+import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -16,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 使用每个channel维护 读 & 写 缓存的方式解决
  * 读:配合特定协议下的业务数据包检查组件 -> 反序列化业务数据包
  * 写:配合记录写位置的指针 -> 下一次写事件时resume上次步骤
- *
+ * <p>
  * 安全 -> 扩展/释放
  * create time: 2020/7/31 15:07
  **/
@@ -55,13 +56,36 @@ public class XBuffer {
         length = 0;
     }
 
-    public void expend2Double(){
+
+    public void cache(ByteBuffer byteBuffer) {
+        int remainBytes = byteBuffer.remaining();
+
+        while (length + remainBytes > content.length) {
+            expend2Double();
+        }
+
+        byteBuffer.get(content, length, remainBytes);
+    }
+
+    public void expend2Double() {
         raceSafely(this::doExpend2Double);
     }
 
-    public void trim(int offset){
-        final int do_offset = offset;
-        raceSafely(()-> doTrim(do_offset));
+
+    /**
+     * called after a successful de-serialisation
+     *
+     * @param offset
+     */
+    public void trim(Integer offset, Integer length) {
+        final Integer do_offset = offset;
+        final Integer do_length = length;
+        raceSafely(() -> doTrim(do_offset, do_length));
+    }
+
+    public void trim(Integer offset) {
+        final Integer do_offset = offset;
+        raceSafely(() -> doTrim(do_offset, null));
     }
 
 
@@ -72,11 +96,11 @@ public class XBuffer {
         content = desc;
     }
 
-    private void doTrim(int offset) {
+    private void doTrim(Integer offset, Integer length) {
         Assert.check(content.length > offset, "content length must bigger than offset");
 
-        byte[] desc = new byte[content.length - offset];
-        System.arraycopy(content, 0, desc, 0, length);
+        byte[] desc = new byte[length == null ? content.length - offset : length];
+        System.arraycopy(content, offset, desc, 0, length == null ? content.length - offset : length);
         content = desc;
     }
 

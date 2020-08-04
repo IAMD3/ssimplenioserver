@@ -14,13 +14,14 @@ import java.util.concurrent.TimeUnit;
 public class QueueTest {
 
     public static void main(String[] args){
-        Queue<XSocket> queue = Config.INBOUND_QUEUE;
-
 
         new Thread(QueueTest::pop)
                 .start();
         new Thread(QueueTest::appendingQueue)
                 .start();
+        new Thread(QueueTest::appendingQueue)
+                .start();
+
 
 
     }

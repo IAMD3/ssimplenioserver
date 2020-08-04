@@ -12,11 +12,11 @@ import codec.XWriter;
 public class HttpCodeCFactory implements CodeCFactory {
     @Override
     public XReader createXReader() {
-        return null;
+        return new DefaultHttpXReader();
     }
 
     @Override
     public XWriter createXWriter() {
-        return null;
+        return new DefaultHttpXWriter();
     }
 }

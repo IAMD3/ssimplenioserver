@@ -15,12 +15,12 @@ import java.nio.channels.SocketChannel;
  * Description: master T
  * create time: 2020/7/31 14:44
  **/
-public class Acceptor implements Runnable {
+public class XAcceptor implements Runnable {
 
     private final ServerSocketChannel ssc;
     private final CodeCFactory codeCFactory;
 
-    public Acceptor(CodeCFactory codeCFactory) throws IOException {
+    public XAcceptor(CodeCFactory codeCFactory) throws IOException {
         this.codeCFactory = codeCFactory;
 
         this.ssc = ServerSocketChannel.open();

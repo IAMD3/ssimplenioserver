@@ -57,6 +57,17 @@ public class XBuffer {
     }
 
 
+    public void cache(byte[] src) {
+        int remainBytes = src.length;
+
+        while (length + remainBytes > content.length) {
+            expend2Double();
+        }
+
+        System.arraycopy(src, 0, content, length, remainBytes);
+        length += remainBytes;
+    }
+
     public void cache(ByteBuffer byteBuffer) {
         int remainBytes = byteBuffer.remaining();
 
@@ -65,6 +76,12 @@ public class XBuffer {
         }
 
         byteBuffer.get(content, length, remainBytes);
+        length += remainBytes;
+    }
+
+    public void reset() {
+        content = new byte[Config.X_BUFFER_INITIAL_SIZE];
+        length = 0;
     }
 
     public void expend2Double() {
@@ -83,11 +100,6 @@ public class XBuffer {
         raceSafely(() -> doTrim(do_offset, do_length));
     }
 
-    public void trim(Integer offset) {
-        final Integer do_offset = offset;
-        raceSafely(() -> doTrim(do_offset, null));
-    }
-
 
     /************************internal methods*************************************************/
     private void doExpend2Double() {
@@ -99,9 +111,10 @@ public class XBuffer {
     private void doTrim(Integer offset, Integer length) {
         Assert.check(content.length > offset, "content length must bigger than offset");
 
-        byte[] desc = new byte[length == null ? content.length - offset : length];
-        System.arraycopy(content, offset, desc, 0, length == null ? content.length - offset : length);
+        byte[] desc = new byte[length];
+        System.arraycopy(content, offset, desc, 0, length);
         content = desc;
+        this.length = length;
     }
 
     private void raceSafely(Runnable action) {

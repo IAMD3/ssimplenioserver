@@ -2,6 +2,7 @@ package codec;
 
 import core.XBuffer;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
@@ -15,7 +16,7 @@ import java.nio.channels.SocketChannel;
  */
 public interface XWriter {
 
-    void write(ByteBuffer src, SocketChannel desc);
+    void write(ByteBuffer src, SocketChannel desc) throws IOException;
 
     void enqueue(XBuffer xBuffer);
 }

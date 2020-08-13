@@ -2,6 +2,7 @@ package codec;
 
 import core.XBuffer;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
  */
 public interface XReader {
 
-    void read(ByteBuffer src);
+    void read(ByteBuffer src) throws IOException;
 
     List<XBuffer> getProtocolSpecialisedBufferBlocks();
 }

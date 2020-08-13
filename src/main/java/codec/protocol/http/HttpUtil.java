@@ -2,19 +2,27 @@ package codec.protocol.http;
 
 import core.XBuffer;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
  * target - > 解析首部段包含content-length(记录body长度) http报文
+ * 取第一行 -> 作为请求行
+ * 不断取后面行作为header行,并且判断有没有content-length
+ * 取到连续两次\r\n(header与body之间有两行) 作为body
  *
  * @Author: Yukai
  * Description: master T
  * create time: 2020/8/4 20:12
  **/
 public class HttpUtil {
+
+    /**
+     * must contained from a complete http request
+     */
     private static final byte[] CONTENT_LENGTH = new byte[]{'C', 'o', 'n', 't', 'e', 'n', 't', '-', 'L', 'e', 'n', 'g', 't', 'h'};
 
-    public static Request parseHttpRequest(XBuffer readerBuffer) throws UnsupportedEncodingException {
+    public static Request tryToParseHttpRequest(XBuffer readerBuffer) throws IOException {
         readerBuffer.trim(0, readerBuffer.getLength());
         byte[] content = readerBuffer.getContent();
 

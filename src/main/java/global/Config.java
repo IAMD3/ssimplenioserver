@@ -16,9 +16,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  **/
 public class Config {
 
-    public static final Queue<XSocket> INBOUND_QUEUE = new ArrayBlockingQueue<XSocket>(1024);
+    public static final int QUEUE_CAPACITY = 1024;
 
-    public static final Queue<XBuffer> OUTBOUND_QUEUE = new ArrayBlockingQueue<XBuffer>(1024);
+    public static final Queue<XSocket> INBOUND_QUEUE = new ArrayBlockingQueue<XSocket>(QUEUE_CAPACITY);
+
+    public static final Queue<XBuffer> OUTBOUND_QUEUE = new ArrayBlockingQueue<XBuffer>(QUEUE_CAPACITY);
 
     public static int PORT = 8080;
 

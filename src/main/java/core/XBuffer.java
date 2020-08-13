@@ -100,6 +100,9 @@ public class XBuffer {
         raceSafely(() -> doTrim(do_offset, do_length));
     }
 
+    public void pureContent() {
+        trim(0, length);
+    }
 
     /************************internal methods*************************************************/
     private void doExpend2Double() {

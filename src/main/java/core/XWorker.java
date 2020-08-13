@@ -25,7 +25,7 @@ public class XWorker implements Runnable {
 
 
     private XHandler handler;
-    private Map<String, XSocket> socketMap;
+    private Map<String, XSocket> connectedSocketsMap;
 
     private Selector readSelector;
     private Selector writeSelector;
@@ -34,7 +34,7 @@ public class XWorker implements Runnable {
     private ByteBuffer writeMediator;
 
     public XWorker() throws IOException {
-        this.socketMap = new ConcurrentHashMap<>();
+        this.connectedSocketsMap = new ConcurrentHashMap<>();
         this.readSelector = Selector.open();
         this.writeSelector = Selector.open();
 
@@ -51,7 +51,6 @@ public class XWorker implements Runnable {
                 TimeUnit.SECONDS.sleep(1);
                 registerAllAcceptedChannelsFromQueue();
                 readFromRegisteredXSocket();
-
                 /****************writing part****************************/
                 writeToSocketsFromOutboundQueue();
 
@@ -85,7 +84,7 @@ public class XWorker implements Runnable {
 
             sk.attach(socket);
 
-            this.socketMap.put(socket.getXSocketId(), socket);
+            this.connectedSocketsMap.put(socket.getXSocketId(), socket);
 
             socket = Config.INBOUND_QUEUE.poll();
         }
@@ -127,6 +126,27 @@ public class XWorker implements Runnable {
     }
 
 
+    private void registerChannelForWriting() throws ClosedChannelException {
+        XBuffer completeMsgBufferBlock = Config.OUTBOUND_QUEUE.poll();
+
+        while (completeMsgBufferBlock != null) {
+            String xSocketId = completeMsgBufferBlock.getXSocketId();
+            XSocket associatedSocket = connectedSocketsMap.get(xSocketId);
+
+            Assert.checkNonNull(associatedSocket);
+
+            SelectionKey sk = associatedSocket.getSocketChannel()
+                    .register(writeSelector, SelectionKey.OP_WRITE);
+            sk.attach(associatedSocket);
+
+            associatedSocket.getXWriter()
+                    .enqueue(completeMsgBufferBlock);
+
+            completeMsgBufferBlock = Config.OUTBOUND_QUEUE.poll();
+        }
+    }
+
+
     private void writeToReadyChannel() throws IOException {
         int selectedCount = writeSelector.selectNow();
 
@@ -145,23 +165,4 @@ public class XWorker implements Runnable {
         }
     }
 
-    private void registerChannelForWriting() throws ClosedChannelException {
-        XBuffer completeMsgBufferBlock = Config.OUTBOUND_QUEUE.poll();
-
-        while (completeMsgBufferBlock != null) {
-            String xSocketId = completeMsgBufferBlock.getXSocketId();
-            XSocket associatedSocket = socketMap.get(xSocketId);
-
-            Assert.checkNonNull(associatedSocket);
-
-            SelectionKey sk = associatedSocket.getSocketChannel()
-                    .register(writeSelector, SelectionKey.OP_WRITE);
-            sk.attach(associatedSocket);
-
-            associatedSocket.getXWriter()
-                    .enqueue(completeMsgBufferBlock);
-
-            completeMsgBufferBlock = Config.OUTBOUND_QUEUE.poll();
-        }
-    }
 }

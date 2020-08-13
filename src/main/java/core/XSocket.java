@@ -53,7 +53,7 @@ public class XSocket {
     }
 
 
-    public void write(ByteBuffer mediator) {
+    public void write(ByteBuffer mediator) throws IOException {
         xWriter.write(mediator, socketChannel);
     }
 

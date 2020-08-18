@@ -4,7 +4,6 @@ import codec.XParser;
 import core.XBuffer;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,24 +17,18 @@ public class DefaultHttpXParser implements XParser {
 
     private List<Request> requests;
 
-    private XBuffer readerBuffer;
 
-    public DefaultHttpXParser(String socketId) {
+    public DefaultHttpXParser() {
         requests = new ArrayList<>();
-        readerBuffer = new XBuffer();
-
-        readerBuffer.setxSocketId(socketId);
     }
 
     @Override
-    public void parse(ByteBuffer src) throws IOException {
-        // ByteBuffer  -> contains the bytes read from NIO read
-        readerBuffer.cache(src);
-
-        Request request = HttpUtil.tryToParseHttpRequest(readerBuffer);
+    public void parse(XBuffer src) throws IOException {
+        // XBuffer  -> contains the bytes read from NIO read
+        Request request = HttpUtil.tryToParseHttpRequest(src);
         while (request != null) {
             requests.add(request);
-            request = HttpUtil.tryToParseHttpRequest(readerBuffer);
+            request = HttpUtil.tryToParseHttpRequest(src);
         }
 
     }

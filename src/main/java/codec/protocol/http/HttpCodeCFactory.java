@@ -12,8 +12,8 @@ import codec.XWriter;
  **/
 public class HttpCodeCFactory implements CodeCFactory {
     @Override
-    public XParser createXReader(String socketId) {
-        return new DefaultHttpXParser(socketId);
+    public XParser createXReader() {
+        return new DefaultHttpXParser();
     }
 
     @Override

@@ -5,7 +5,6 @@ import ext.XHandler;
 import global.Container;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -44,10 +43,11 @@ public class XWorker implements Runnable {
         while (true) {
             try {
                 TimeUnit.SECONDS.sleep(1);
-                registerAllAcceptedChannelsFromQueue();
-                readFromRegisteredXSocket();
+                registerAllAcceptedSockets();
+                readReadySockets();
                 /****************writing part****************************/
-                writeToSocketsFromOutboundQueue();
+                registerSockesForWriting();
+                writeToReadyChannel();
 
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
@@ -66,11 +66,7 @@ public class XWorker implements Runnable {
     }
 
     /***********************************************************************************/
-    private void offerToQueue(Queue desc, XBuffer xBuffer) {
-        desc.add(xBuffer);
-    }
-
-    private void registerAllAcceptedChannelsFromQueue() throws IOException {
+    private void registerAllAcceptedSockets() throws IOException {
         XSocket socket = Container.INBOUND_QUEUE.poll();
 
         while (socket != null) {
@@ -85,7 +81,7 @@ public class XWorker implements Runnable {
         }
     }
 
-    private void readFromRegisteredXSocket() throws IOException {
+    private void readReadySockets() throws IOException {
         int selectedCount = readSelector.selectNow();
 
         if (selectedCount > 0) {
@@ -118,13 +114,8 @@ public class XWorker implements Runnable {
     }
 
     /**********************************write********************************************************************/
-    private void writeToSocketsFromOutboundQueue() throws IOException {
-        registerChannelForWriting();
-        writeToReadyChannel();
-    }
 
-
-    private void registerChannelForWriting() throws ClosedChannelException {
+    private void registerSockesForWriting() throws ClosedChannelException {
         XBuffer completeMsgBufferBlock = Container.OUTBOUND_QUEUE.poll();
 
         while (completeMsgBufferBlock != null) {
@@ -137,7 +128,7 @@ public class XWorker implements Runnable {
                     .register(writeSelector, SelectionKey.OP_WRITE);
             sk.attach(associatedSocket);
 
-            associatedSocket.getxWriter()
+            associatedSocket
                     .enqueue(completeMsgBufferBlock);
 
             completeMsgBufferBlock = Container.OUTBOUND_QUEUE.poll();

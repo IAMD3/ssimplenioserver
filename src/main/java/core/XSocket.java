@@ -40,14 +40,14 @@ public class XSocket {
         this.socketChannel = sc;
 
         this.xSocketId = Container.getXSocketId();
-        this.readBuffer = new XBuffer();
-        this.writeBuffer = new XBuffer();
+        this.readBuffer = new XBuffer(); readBuffer.setxSocketId(this.xSocketId);
+        this.writeBuffer = new XBuffer(); writeBuffer.setxSocketId(this.xSocketId);
 
         init = false;
     }
 
     public void initCodeC(CodeCFactory factory) {
-        this.xParser = factory.createXReader(this.xSocketId);
+        this.xParser = factory.createXReader();
         this.xWriter = factory.createXWriter();
 
         init = true;
@@ -60,13 +60,16 @@ public class XSocket {
 
 
     public void read() throws IOException {
-        ByteBuffer mediator =  Container.readMediator;
+        ByteBuffer mediator = Container.readMediator;
         //a reading attempt
-        int byteRead = fillReadingByteBuffer(mediator);
+        int byteRead = keepReadingByteBuffer(mediator);
         if (byteRead == 0) return;
 
         mediator.flip();
-        xParser.parse(mediator);
+        readBuffer.cache(mediator);
+        xParser.parse(readBuffer);
+
+        mediator.clear();
     }
 
 
@@ -79,7 +82,7 @@ public class XSocket {
      * @return totalBytes read
      * @throws IOException
      */
-    public int fillReadingByteBuffer(ByteBuffer mediator) throws IOException {
+    private int keepReadingByteBuffer(ByteBuffer mediator) throws IOException {
         int bytesRead = socketChannel.read(mediator);
         int totalBytesRead = bytesRead;
 
@@ -91,26 +94,9 @@ public class XSocket {
         return totalBytesRead;
     }
 
-    /**
-     * called by implementation of codec.XWriter
-     * cannot know how many bytes written from
-     * java.nio.channels.SocketChannel#write(java.nio.ByteBuffer)
-     * so.... keeping writing till no thing can write any more
-     *
-     * @return total Bytes written
-     */
-    public int subCall_keepWritingToChannel(ByteBuffer mediator) throws IOException {
-        int bytesWritten = socketChannel.write(mediator);
-        int totalBytesWritten = bytesWritten;
-
-        while (bytesWritten > 0) {
-            bytesWritten = socketChannel.write(mediator);
-            totalBytesWritten += bytesWritten;
-        }
-
-        return totalBytesWritten;
+    public void enqueue(XBuffer xBuffer) {
+        this.xWriter.enqueue(xBuffer);
     }
-
 
 
     public String getxSocketId() {

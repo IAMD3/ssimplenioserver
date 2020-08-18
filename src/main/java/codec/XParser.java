@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface XParser {
 
-    void parse(ByteBuffer src) throws IOException;
+    void parse(XBuffer src) throws IOException;
 
     List<XBuffer> getOutputs();
 }

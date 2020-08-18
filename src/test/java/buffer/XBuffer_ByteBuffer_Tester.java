@@ -1,7 +1,7 @@
 package buffer;
 
 import core.XBuffer;
-import global.Config;
+import global.Container;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 public class XBuffer_ByteBuffer_Tester {
 
     public static void main(String[] args) throws UnsupportedEncodingException {
-        ByteBuffer byteBuffer = ByteBuffer.allocate(Config.BYTE_BUFFER_INITIAL_SIZE);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(Container.BYTE_BUFFER_INITIAL_SIZE);
 
         byte[] bytes = "helloWorld".getBytes("utf-8");
         byteBuffer.put(bytes);

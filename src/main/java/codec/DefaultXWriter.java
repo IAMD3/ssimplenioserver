@@ -1,8 +1,7 @@
-package codec.protocol.http;
+package codec;
 
-import codec.XWriter;
 import core.XBuffer;
-import global.Config;
+import global.Container;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -15,7 +14,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  * Description: master T
  * create time: 2020/8/4 16:47
  **/
-public class DefaultHttpXWriter implements XWriter {
+public class DefaultXWriter implements XWriter {
 
     private Queue<XBuffer> respQueue;
 
@@ -23,8 +22,8 @@ public class DefaultHttpXWriter implements XWriter {
 
     private int processingRespOffset;
 
-    public DefaultHttpXWriter() {
-        respQueue = new ArrayBlockingQueue<XBuffer>(Config.QUEUE_CAPACITY);
+    public DefaultXWriter() {
+        respQueue = new ArrayBlockingQueue<XBuffer>(Container.QUEUE_CAPACITY);
         processingRespOffset = 0;
     }
 

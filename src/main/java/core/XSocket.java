@@ -1,10 +1,9 @@
 package core;
 
 import codec.CodeCFactory;
-import codec.XReader;
+import codec.XParser;
 import codec.XWriter;
-import global.Config;
-import lombok.Data;
+import global.Container;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -15,10 +14,11 @@ import java.nio.channels.SocketChannel;
  * Description: master T
  * create time: 2020/7/31 14:54
  **/
-@Data
 public class XSocket {
 
+
     private String xSocketId;
+
 
     private SocketChannel socketChannel;
 
@@ -26,10 +26,11 @@ public class XSocket {
 
     private XBuffer writeBuffer;
 
+
     /**
      * common reader & writer -> should be adaptable for various protocols
      **/
-    private XReader xReader;
+    private XParser xParser;
 
     private XWriter xWriter;
 
@@ -38,7 +39,7 @@ public class XSocket {
     public XSocket(SocketChannel sc) {
         this.socketChannel = sc;
 
-        this.xSocketId = Config.getXSocketId();
+        this.xSocketId = Container.getXSocketId();
         this.readBuffer = new XBuffer();
         this.writeBuffer = new XBuffer();
 
@@ -46,25 +47,26 @@ public class XSocket {
     }
 
     public void initCodeC(CodeCFactory factory) {
-        this.xReader = factory.createXReader(this.xSocketId);
+        this.xParser = factory.createXReader(this.xSocketId);
         this.xWriter = factory.createXWriter();
 
         init = true;
     }
 
 
-    public void write(ByteBuffer mediator) throws IOException {
-        xWriter.write(mediator, socketChannel);
+    public void write() throws IOException {
+        xWriter.write(Container.writeMediator, socketChannel);
     }
 
 
-    public void read(ByteBuffer mediator) throws IOException {
+    public void read() throws IOException {
+        ByteBuffer mediator =  Container.readMediator;
         //a reading attempt
         int byteRead = fillReadingByteBuffer(mediator);
         if (byteRead == 0) return;
 
         mediator.flip();
-        xReader.read(mediator);
+        xParser.parse(mediator);
     }
 
 
@@ -108,4 +110,23 @@ public class XSocket {
 
         return totalBytesWritten;
     }
+
+
+
+    public String getxSocketId() {
+        return xSocketId;
+    }
+
+    public SocketChannel getSocketChannel() {
+        return socketChannel;
+    }
+
+    public XWriter getxWriter() {
+        return xWriter;
+    }
+
+    public XParser getxParser() {
+        return xParser;
+    }
+
 }

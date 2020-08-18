@@ -2,8 +2,7 @@ package core;
 
 import com.sun.tools.javac.util.Assert;
 import ext.XHandler;
-import global.Config;
-import lombok.Data;
+import global.Container;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -20,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  * Description: master T
  * create time: 2020/8/3 16:52
  **/
-@Data
+
 public class XWorker implements Runnable {
 
 
@@ -30,16 +29,12 @@ public class XWorker implements Runnable {
     private Selector readSelector;
     private Selector writeSelector;
 
-    private ByteBuffer readMediator;
-    private ByteBuffer writeMediator;
+
 
     public XWorker() throws IOException {
         this.connectedSocketsMap = new ConcurrentHashMap<>();
         this.readSelector = Selector.open();
         this.writeSelector = Selector.open();
-
-        this.readMediator = ByteBuffer.allocate(Config.BYTE_BUFFER_INITIAL_SIZE);
-        this.writeMediator = ByteBuffer.allocate(Config.BYTE_BUFFER_INITIAL_SIZE);
     }
 
 
@@ -76,7 +71,7 @@ public class XWorker implements Runnable {
     }
 
     private void registerAllAcceptedChannelsFromQueue() throws IOException {
-        XSocket socket = Config.INBOUND_QUEUE.poll();
+        XSocket socket = Container.INBOUND_QUEUE.poll();
 
         while (socket != null) {
             SocketChannel socketChannel = socket.getSocketChannel();
@@ -84,9 +79,9 @@ public class XWorker implements Runnable {
 
             sk.attach(socket);
 
-            this.connectedSocketsMap.put(socket.getXSocketId(), socket);
+            this.connectedSocketsMap.put(socket.getxSocketId(), socket);
 
-            socket = Config.INBOUND_QUEUE.poll();
+            socket = Container.INBOUND_QUEUE.poll();
         }
     }
 
@@ -103,16 +98,19 @@ public class XWorker implements Runnable {
 
                 XSocket xSocket = (XSocket) nextSelectionKey.attachment();
 
-                xSocket.read(readMediator);
+                xSocket.read();
 
-                List<XBuffer> completeMsgBufferBlocks = xSocket.getXReader()
-                        .getProtocolSpecialisedBufferBlocks();
+                List<XBuffer> completeMsgBufferBlocks = xSocket.getxParser()
+                        .getOutputs();
 
                 if (completeMsgBufferBlocks.size() > 0) {
-                    //handle the complete requests from a NIO channel read
+                    //handle the complete request(s) from a NIO channel read
                     if (handler != null) {
-                        //note: it is a handler's responsibility to offer a complete message buffer block to outbound queue
-                        handler.handle(xSocket);
+
+                        completeMsgBufferBlocks
+                                .stream()
+                                .map(handler::handle)
+                                .forEach(Container.OUTBOUND_QUEUE::offer);
                     }
                 }
             }
@@ -127,10 +125,10 @@ public class XWorker implements Runnable {
 
 
     private void registerChannelForWriting() throws ClosedChannelException {
-        XBuffer completeMsgBufferBlock = Config.OUTBOUND_QUEUE.poll();
+        XBuffer completeMsgBufferBlock = Container.OUTBOUND_QUEUE.poll();
 
         while (completeMsgBufferBlock != null) {
-            String xSocketId = completeMsgBufferBlock.getXSocketId();
+            String xSocketId = completeMsgBufferBlock.getxSocketId();
             XSocket associatedSocket = connectedSocketsMap.get(xSocketId);
 
             Assert.checkNonNull(associatedSocket);
@@ -139,10 +137,10 @@ public class XWorker implements Runnable {
                     .register(writeSelector, SelectionKey.OP_WRITE);
             sk.attach(associatedSocket);
 
-            associatedSocket.getXWriter()
+            associatedSocket.getxWriter()
                     .enqueue(completeMsgBufferBlock);
 
-            completeMsgBufferBlock = Config.OUTBOUND_QUEUE.poll();
+            completeMsgBufferBlock = Container.OUTBOUND_QUEUE.poll();
         }
     }
 
@@ -157,7 +155,7 @@ public class XWorker implements Runnable {
                 SelectionKey selectionKey = it.next();
                 XSocket writableXSocket
                         = (XSocket) selectionKey.attachment();
-                writableXSocket.write(writeMediator);
+                writableXSocket.write();
                 it.remove();
             }
 

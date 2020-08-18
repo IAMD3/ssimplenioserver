@@ -52,7 +52,7 @@ public class HttpUtil {
         if (content_length == 0) {
             //return a request without body
             Request request = new Request();
-            request.setSocketId(readerBuffer.getXSocketId())
+            request.setSocketId(readerBuffer.getxSocketId())
                     .setContent(content)
                     .setRequestLineOffset(0)
                     .setHeadersOffset(request_line_end_index + 1)
@@ -70,7 +70,7 @@ public class HttpUtil {
             // rare but perfect condition
             Request request = new Request();
 
-            request.setSocketId(readerBuffer.getXSocketId())
+            request.setSocketId(readerBuffer.getxSocketId())
                     .setContent(content)
                     .setRequestLineOffset(0)
                     .setHeadersOffset(request_line_end_index + 1)
@@ -85,7 +85,7 @@ public class HttpUtil {
             byte[] request_content = new byte[body_end_index];
             System.arraycopy(content, 0, request_content, 0, body_end_index);
 
-            request.setSocketId(readerBuffer.getXSocketId())
+            request.setSocketId(readerBuffer.getxSocketId())
                     .setContent(request_content)
                     .setRequestLineOffset(0)
                     .setHeadersOffset(request_line_end_index + 1)

@@ -3,7 +3,6 @@ package core;
 import codec.CodeCFactory;
 import codec.protocol.http.HttpCodeCFactory;
 import ext.XHandler;
-import lombok.Setter;
 
 import java.io.IOException;
 
@@ -14,10 +13,9 @@ import java.io.IOException;
  **/
 public class XServer {
 
-    @Setter
+
     private CodeCFactory codeCFactory;
 
-    @Setter
     private XHandler handlerPipeline;
 
 
@@ -36,4 +34,10 @@ public class XServer {
                 .start();
         System.err.println("welcome to SSNIO server");
     }
+
+
+    public void setHandlerPipeline(XHandler handlerPipeline) {
+        this.handlerPipeline = handlerPipeline;
+    }
+
 }

@@ -1,8 +1,7 @@
 package codec.protocol.http;
 
-import codec.XReader;
+import codec.XParser;
 import core.XBuffer;
-import lombok.Data;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -15,22 +14,21 @@ import java.util.stream.Collectors;
  * Description: master T
  * create time: 2020/8/4 16:47
  **/
-@Data
-public class DefaultHttpXReader implements XReader {
+public class DefaultHttpXParser implements XParser {
 
     private List<Request> requests;
 
     private XBuffer readerBuffer;
 
-    public DefaultHttpXReader(String socketId) {
+    public DefaultHttpXParser(String socketId) {
         requests = new ArrayList<>();
         readerBuffer = new XBuffer();
 
-        readerBuffer.setXSocketId(socketId);
+        readerBuffer.setxSocketId(socketId);
     }
 
     @Override
-    public void read(ByteBuffer src) throws IOException {
+    public void parse(ByteBuffer src) throws IOException {
         // ByteBuffer  -> contains the bytes read from NIO read
         readerBuffer.cache(src);
 
@@ -43,7 +41,7 @@ public class DefaultHttpXReader implements XReader {
     }
 
     @Override
-    public List<XBuffer> getProtocolSpecialisedBufferBlocks() {
+    public List<XBuffer> getOutputs() {
         if (requests.size() == 0) return new ArrayList<>();
 
         return requests.stream()
@@ -54,7 +52,7 @@ public class DefaultHttpXReader implements XReader {
     private XBuffer toXBuffer(Request request) {
         XBuffer xBuffer = new XBuffer();
         xBuffer.cache(request.getContent());
-        xBuffer.setXSocketId(request.getSocketId());
+        xBuffer.setxSocketId(request.getSocketId());
         return xBuffer;
     }
 }

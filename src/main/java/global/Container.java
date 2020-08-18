@@ -3,6 +3,7 @@ package global;
 import core.XBuffer;
 import core.XSocket;
 
+import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Description: master T
  * create time: 2020/7/31 14:44
  **/
-public class Config {
+public class Container {
 
     public static final int QUEUE_CAPACITY = 1024;
 
@@ -29,6 +30,9 @@ public class Config {
     public static int X_BUFFER_INITIAL_SIZE = 4 * 1024; //4KB
 
     public static int BYTE_BUFFER_INITIAL_SIZE = 4 *1024; //4KB
+
+    public static ByteBuffer readMediator = ByteBuffer.allocate(Container.BYTE_BUFFER_INITIAL_SIZE);;
+    public static ByteBuffer writeMediator = ByteBuffer.allocate(Container.BYTE_BUFFER_INITIAL_SIZE);;
 
     /**
      * race safely

@@ -1,7 +1,7 @@
 package queue;
 
 import core.XSocket;
-import global.Config;
+import global.Container;
 
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +27,7 @@ public class QueueTest {
     }
 
     private static void pop(){
-        Queue<XSocket> queue = Config.INBOUND_QUEUE;
+        Queue<XSocket> queue = Container.INBOUND_QUEUE;
         while (true){
             try {
                 TimeUnit.MILLISECONDS.sleep(300);
@@ -39,7 +39,7 @@ public class QueueTest {
     }
 
     private static void appendingQueue(){
-        Queue<XSocket> queue = Config.INBOUND_QUEUE;
+        Queue<XSocket> queue = Container.INBOUND_QUEUE;
 
         while(true){
             try {

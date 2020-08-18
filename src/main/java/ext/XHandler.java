@@ -1,5 +1,6 @@
 package ext;
 
+import core.XBuffer;
 import core.XSocket;
 
 /** pipeline 扩展点
@@ -11,7 +12,7 @@ import core.XSocket;
  * @author Master T
  */
 public interface XHandler {
-    void handle(XSocket socket);
+    XBuffer handle(XBuffer reqBuffer);
 
     XHandler next();
 }

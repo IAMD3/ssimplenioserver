@@ -1,8 +1,7 @@
 package core;
 
 import com.sun.tools.javac.util.Assert;
-import global.Config;
-import lombok.Data;
+import global.Container;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,8 +20,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 安全 -> 扩展/释放
  * create time: 2020/7/31 15:07
  **/
-@Data
+
 public class XBuffer {
+
 
     /**
      * associated XSocketId
@@ -52,7 +52,7 @@ public class XBuffer {
 
 
     public XBuffer() {
-        content = new byte[Config.X_BUFFER_INITIAL_SIZE];
+        content = new byte[Container.X_BUFFER_INITIAL_SIZE];
         length = 0;
     }
 
@@ -80,7 +80,7 @@ public class XBuffer {
     }
 
     public void reset() {
-        content = new byte[Config.X_BUFFER_INITIAL_SIZE];
+        content = new byte[Container.X_BUFFER_INITIAL_SIZE];
         length = 0;
     }
 
@@ -130,4 +130,32 @@ public class XBuffer {
         }
 
     }
+
+
+
+
+    public String getxSocketId() {
+        return xSocketId;
+    }
+
+    public void setxSocketId(String xSocketId) {
+        this.xSocketId = xSocketId;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
+    }
+
 }

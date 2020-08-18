@@ -14,9 +14,9 @@ import java.util.List;
  *
  * @author Master T
  */
-public interface XReader {
+public interface XParser {
 
-    void read(ByteBuffer src) throws IOException;
+    void parse(ByteBuffer src) throws IOException;
 
-    List<XBuffer> getProtocolSpecialisedBufferBlocks();
+    List<XBuffer> getOutputs();
 }

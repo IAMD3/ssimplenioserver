@@ -1,7 +1,8 @@
 package codec.protocol.http;
 
 import codec.CodeCFactory;
-import codec.XReader;
+import codec.DefaultXWriter;
+import codec.XParser;
 import codec.XWriter;
 
 /** todo
@@ -11,12 +12,12 @@ import codec.XWriter;
  **/
 public class HttpCodeCFactory implements CodeCFactory {
     @Override
-    public XReader createXReader(String socketId) {
-        return new DefaultHttpXReader(socketId);
+    public XParser createXReader(String socketId) {
+        return new DefaultHttpXParser(socketId);
     }
 
     @Override
     public XWriter createXWriter() {
-        return new DefaultHttpXWriter();
+        return new DefaultXWriter();
     }
 }

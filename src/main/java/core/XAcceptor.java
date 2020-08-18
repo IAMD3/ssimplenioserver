@@ -1,7 +1,7 @@
 package core;
 
 import codec.CodeCFactory;
-import global.Config;
+import global.Container;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -24,7 +24,7 @@ public class XAcceptor implements Runnable {
         this.codeCFactory = codeCFactory;
 
         this.ssc = ServerSocketChannel.open();
-        ssc.bind(new InetSocketAddress(Config.PORT));
+        ssc.bind(new InetSocketAddress(Container.PORT));
     }
 
     @Override
@@ -37,7 +37,7 @@ public class XAcceptor implements Runnable {
                 XSocket xSocket = new XSocket(sc);
                 xSocket.initCodeC(this.codeCFactory);
 
-                Config.INBOUND_QUEUE.offer(xSocket);
+                Container.INBOUND_QUEUE.offer(xSocket);
             } catch (IOException e) {
                 e.printStackTrace();
             }

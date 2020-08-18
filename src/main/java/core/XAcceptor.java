@@ -32,6 +32,7 @@ public class XAcceptor implements Runnable {
         while (true) {
             try {
                 SocketChannel sc = ssc.accept();
+                sc.configureBlocking(false);
 
                 XSocket xSocket = new XSocket(sc);
                 xSocket.initCodeC(this.codeCFactory);

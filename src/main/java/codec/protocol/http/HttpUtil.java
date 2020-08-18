@@ -31,7 +31,7 @@ public class HttpUtil {
 
         int header_start_index = request_line_end_index + 1;
         int header_end_index = findNextLine(header_start_index, content.length, content);
-        int content_length = -1;
+        int content_length = 0;
 
 
         while (/**not qualified**/header_end_index != -1 && /**reach body**/header_end_index != header_start_index + 1) {
@@ -44,8 +44,23 @@ public class HttpUtil {
             header_end_index = findNextLine(header_start_index, content.length, content);
         }
 
-        if (/**header not complete**/header_end_index == -1 ||/**no content-length found**/content_length == -1)
-            return null;
+        // "GET / HTTP/1.1\r\n
+        //Head:aaa\r\n
+        // \r\n";
+        if (/**header not complete**/header_end_index == -1) return null;
+
+        if (content_length == 0) {
+            //return a request without body
+            Request request = new Request();
+            request.setSocketId(readerBuffer.getXSocketId())
+                    .setContent(content)
+                    .setRequestLineOffset(0)
+                    .setHeadersOffset(request_line_end_index + 1)
+                    .setBodyOffset(-1);
+            //clear all data of readerBuffer;
+            readerBuffer.reset();
+            return request;
+        }
 
         //try to parse body
         int body_start_index = header_end_index + 1;

@@ -20,7 +20,7 @@ public abstract class AbstractXHandler implements XHandler {
      * @param xSocket
      * @return
      */
-    abstract List<XBuffer> doHandler(XSocket xSocket);
+    public abstract List<XBuffer> doHandler(XSocket xSocket);
 
     /**template method
      * @param socket

@@ -13,7 +13,7 @@ package codec;
  */
 public interface CodeCFactory {
 
-    XReader createXReader();
+    XReader createXReader(String socketId);
 
     XWriter createXWriter();
 

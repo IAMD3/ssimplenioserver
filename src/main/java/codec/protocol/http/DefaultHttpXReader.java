@@ -22,9 +22,11 @@ public class DefaultHttpXReader implements XReader {
 
     private XBuffer readerBuffer;
 
-    public DefaultHttpXReader() {
+    public DefaultHttpXReader(String socketId) {
         requests = new ArrayList<>();
         readerBuffer = new XBuffer();
+
+        readerBuffer.setXSocketId(socketId);
     }
 
     @Override

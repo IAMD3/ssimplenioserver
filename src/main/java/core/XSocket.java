@@ -46,7 +46,7 @@ public class XSocket {
     }
 
     public void initCodeC(CodeCFactory factory) {
-        this.xReader = factory.createXReader();
+        this.xReader = factory.createXReader(this.xSocketId);
         this.xWriter = factory.createXWriter();
 
         init = true;
@@ -63,6 +63,7 @@ public class XSocket {
         int byteRead = fillReadingByteBuffer(mediator);
         if (byteRead == 0) return;
 
+        mediator.flip();
         xReader.read(mediator);
     }
 

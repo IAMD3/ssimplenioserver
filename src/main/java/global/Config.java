@@ -22,7 +22,7 @@ public class Config {
 
     public static final Queue<XBuffer> OUTBOUND_QUEUE = new ArrayBlockingQueue<XBuffer>(QUEUE_CAPACITY);
 
-    public static int PORT = 8080;
+    public static int PORT = 8888;
 
     public static AtomicInteger COUNT = new AtomicInteger(0);
 

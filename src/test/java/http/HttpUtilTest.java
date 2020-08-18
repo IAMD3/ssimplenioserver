@@ -6,7 +6,7 @@ import com.sun.tools.javac.util.Assert;
 import core.XBuffer;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+
 import java.nio.ByteBuffer;
 
 /**

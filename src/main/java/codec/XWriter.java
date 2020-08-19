@@ -19,4 +19,6 @@ public interface XWriter {
     void write(ByteBuffer src, SocketChannel desc) throws IOException;
 
     void enqueue(XBuffer xBuffer);
+
+    boolean isEmpty();
 }

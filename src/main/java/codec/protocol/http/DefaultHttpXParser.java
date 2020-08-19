@@ -17,6 +17,8 @@ public class DefaultHttpXParser implements XParser {
 
     private List<Request> requests;
 
+    private boolean endOfStreamReached =false;
+
 
     public DefaultHttpXParser() {
         requests = new ArrayList<>();
@@ -41,6 +43,12 @@ public class DefaultHttpXParser implements XParser {
                 .map(this::toXBuffer)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void clearOutputs() {
+        requests.clear();
+    }
+
 
     private XBuffer toXBuffer(Request request) {
         XBuffer xBuffer = new XBuffer();

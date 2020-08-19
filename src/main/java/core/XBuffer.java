@@ -85,7 +85,7 @@ public class XBuffer {
     }
 
     public void expend2Double() {
-        raceSafely(this::doExpend2Double);
+        doExpend2Double();
     }
 
 
@@ -97,7 +97,7 @@ public class XBuffer {
     public void trim(Integer offset, Integer length) {
         final Integer do_offset = offset;
         final Integer do_length = length;
-        raceSafely(() -> doTrim(do_offset, do_length));
+       doTrim(do_offset, do_length);
     }
 
     public void pureContent() {
@@ -106,7 +106,14 @@ public class XBuffer {
 
     /************************internal methods*************************************************/
     private void doExpend2Double() {
-        byte[] desc = new byte[content.length * 2];
+        byte[] desc;
+        if(content.length < Container.BYTE_BUFFER_INITIAL_SIZE){
+            desc = new byte[Container.BYTE_BUFFER_INITIAL_SIZE];
+        }else {
+            desc =  new byte[content.length * 2];
+        }
+
+
         System.arraycopy(content, 0, desc, 0, length);
         content = desc;
     }
@@ -120,16 +127,6 @@ public class XBuffer {
         this.length = length;
     }
 
-    private void raceSafely(Runnable action) {
-        try {
-            if (flag.compareAndSet(READY, PROCESSING)) {
-                action.run();
-            }
-        } finally {
-            flag.compareAndSet(PROCESSING, READY);
-        }
-
-    }
 
 
 

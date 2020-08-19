@@ -36,6 +36,8 @@ public class XSocket {
 
     private boolean init;
 
+    private boolean endOfStreamReached = false;
+
     public XSocket(SocketChannel sc) {
         this.socketChannel = sc;
 
@@ -63,7 +65,11 @@ public class XSocket {
         ByteBuffer mediator = Container.readMediator;
         //a reading attempt
         int byteRead = keepReadingByteBuffer(mediator);
-        if (byteRead == 0) return;
+        if (byteRead == 0 ) return;
+        if(byteRead == -1){
+            endOfStreamReached = true;
+            return;
+        }
 
         mediator.flip();
         readBuffer.cache(mediator);
@@ -98,6 +104,10 @@ public class XSocket {
         this.xWriter.enqueue(xBuffer);
     }
 
+
+    public boolean isEndOfStreamReached(){
+        return endOfStreamReached;
+    }
 
     public String getxSocketId() {
         return xSocketId;

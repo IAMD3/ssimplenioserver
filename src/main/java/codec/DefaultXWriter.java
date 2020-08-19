@@ -33,19 +33,20 @@ public class DefaultXWriter implements XWriter {
      * 一轮写操作:
      * 1. 写了完整一个业务数据包 -> Queue中取下一个业务数据包 本次写操作
      * 2. 写了部分业务数据包 -> 记录位置...下次对应NIO channel为可写状态的时候resume
+     *
      * @throws IOException
      */
     @Override
     public void write(ByteBuffer mediator, SocketChannel desc) throws IOException {
         if (inFlyRespBuffer == null) return;
 
-        inFlyRespBuffer.pureContent();
         mediator.put(inFlyRespBuffer.getContent()
                 , processingRespOffset
                 , inFlyRespBuffer.getLength() - processingRespOffset);
         mediator.flip();
 
         int bytesWritten = desc.write(mediator);
+        processingRespOffset += bytesWritten;
 
         while (/**if able to write to NIO associated channel**/bytesWritten > 0
                 && /**if finishing writing a response**/mediator.hasRemaining()) {
@@ -53,7 +54,7 @@ public class DefaultXWriter implements XWriter {
             processingRespOffset += bytesWritten;
         }
 
-        if(/**a complete msg written**/processingRespOffset == inFlyRespBuffer.getLength()){
+        if (/**a complete msg written**/processingRespOffset == inFlyRespBuffer.getLength()) {
             inFlyRespBuffer = respQueue.poll();
             processingRespOffset = 0;
         }
@@ -71,5 +72,10 @@ public class DefaultXWriter implements XWriter {
             respQueue.offer(xBuffer);
         }
 
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return inFlyRespBuffer == null;
     }
 }

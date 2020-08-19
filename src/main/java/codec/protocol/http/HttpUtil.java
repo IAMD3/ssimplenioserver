@@ -23,6 +23,10 @@ public class HttpUtil {
     private static final byte[] CONTENT_LENGTH = new byte[]{'C', 'o', 'n', 't', 'e', 'n', 't', '-', 'L', 'e', 'n', 'g', 't', 'h'};
 
     public static Request tryToParseHttpRequest(XBuffer readerBuffer) throws IOException {
+        if(readerBuffer.getLength() ==0){
+            return null;
+        }
+
         readerBuffer.trim(0, readerBuffer.getLength());
         byte[] content = readerBuffer.getContent();
 

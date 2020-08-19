@@ -19,4 +19,6 @@ public interface XParser {
     void parse(XBuffer src) throws IOException;
 
     List<XBuffer> getOutputs();
+
+    void clearOutputs();
 }

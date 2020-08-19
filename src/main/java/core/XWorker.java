@@ -5,7 +5,6 @@ import ext.XHandler;
 import global.Container;
 
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -24,14 +23,18 @@ public class XWorker implements Runnable {
 
     private XHandler handler;
     private Map<String, XSocket> connectedSocketsMap;
+    private Map<String, XSocket> activeWritingSocketsMap;
+    private Map<String, XSocket> inactiveWritingSocketsMap;
+
 
     private Selector readSelector;
     private Selector writeSelector;
 
 
-
     public XWorker() throws IOException {
         this.connectedSocketsMap = new ConcurrentHashMap<>();
+        this.activeWritingSocketsMap = new ConcurrentHashMap<>();
+        inactiveWritingSocketsMap = new ConcurrentHashMap<>();
         this.readSelector = Selector.open();
         this.writeSelector = Selector.open();
     }
@@ -42,14 +45,15 @@ public class XWorker implements Runnable {
 
         while (true) {
             try {
-                TimeUnit.SECONDS.sleep(1);
                 registerAllAcceptedSockets();
                 readReadySockets();
                 /****************writing part****************************/
-                registerSockesForWriting();
+                refreshSocketsForWriting();
+                refreshRegistrationOfWringSockets();
                 writeToReadyChannel();
 
-            } catch (IOException | InterruptedException e) {
+
+            } catch (IOException  e) {
                 e.printStackTrace();
             }
         }
@@ -72,7 +76,6 @@ public class XWorker implements Runnable {
         while (socket != null) {
             SocketChannel socketChannel = socket.getSocketChannel();
             SelectionKey sk = socketChannel.register(readSelector, SelectionKey.OP_READ);
-
             sk.attach(socket);
 
             this.connectedSocketsMap.put(socket.getxSocketId(), socket);
@@ -107,15 +110,21 @@ public class XWorker implements Runnable {
                                 .stream()
                                 .map(handler::handle)
                                 .forEach(Container.OUTBOUND_QUEUE::offer);
+
+                        xSocket.getxParser()
+                                .clearOutputs();
                     }
                 }
+
+                it.remove();
             }
+            selectionKeys.clear();
         }
     }
 
     /**********************************write********************************************************************/
 
-    private void registerSockesForWriting() throws ClosedChannelException {
+    private void refreshSocketsForWriting() {
         XBuffer completeMsgBufferBlock = Container.OUTBOUND_QUEUE.poll();
 
         while (completeMsgBufferBlock != null) {
@@ -123,16 +132,31 @@ public class XWorker implements Runnable {
             XSocket associatedSocket = connectedSocketsMap.get(xSocketId);
 
             Assert.checkNonNull(associatedSocket);
-
-            SelectionKey sk = associatedSocket.getSocketChannel()
-                    .register(writeSelector, SelectionKey.OP_WRITE);
-            sk.attach(associatedSocket);
-
             associatedSocket
                     .enqueue(completeMsgBufferBlock);
 
+            activeWritingSocketsMap.put(xSocketId, associatedSocket);
+            inactiveWritingSocketsMap.remove(xSocketId);
+
             completeMsgBufferBlock = Container.OUTBOUND_QUEUE.poll();
         }
+    }
+
+
+    private void refreshRegistrationOfWringSockets() throws IOException {
+        Collection<XSocket> activeSockets = activeWritingSocketsMap.values();
+        for (XSocket socket : activeSockets) {
+            SelectionKey sk = socket.getSocketChannel().register(writeSelector, SelectionKey.OP_WRITE);
+            sk.attach(socket);
+        }
+        activeWritingSocketsMap.clear();
+
+        Collection<XSocket> inactiveSockets = inactiveWritingSocketsMap.values();
+        for (XSocket socket : inactiveSockets) {
+            SelectionKey sk = socket.getSocketChannel().keyFor(writeSelector);
+            sk.cancel();
+        }
+        inactiveWritingSocketsMap.clear();
     }
 
 
@@ -142,11 +166,16 @@ public class XWorker implements Runnable {
         if (selectedCount > 0) {
             Set<SelectionKey> selectionKeys = writeSelector.selectedKeys();
             Iterator<SelectionKey> it = selectionKeys.iterator();
-            while (it.hasNext()){
+            while (it.hasNext()) {
                 SelectionKey selectionKey = it.next();
                 XSocket writableXSocket
                         = (XSocket) selectionKey.attachment();
-                writableXSocket.write();
+                writableXSocket.
+                        write();
+
+                if (writableXSocket.getxWriter().isEmpty()) {
+                    inactiveWritingSocketsMap.put(writableXSocket.getxSocketId(), writableXSocket);
+                }
                 it.remove();
             }
 

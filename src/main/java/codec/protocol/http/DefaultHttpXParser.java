@@ -2,11 +2,9 @@ package codec.protocol.http;
 
 import codec.XParser;
 import core.XBuffer;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @Author: Yukai
@@ -15,7 +13,7 @@ import java.util.stream.Collectors;
  **/
 public class DefaultHttpXParser implements XParser {
 
-    private List<Request> requests;
+    private List<XBuffer> requests;
 
     private boolean endOfStreamReached =false;
 
@@ -39,21 +37,7 @@ public class DefaultHttpXParser implements XParser {
     public List<XBuffer> getOutputs() {
         if (requests.size() == 0) return new ArrayList<>();
 
-        return requests.stream()
-                .map(this::toXBuffer)
-                .collect(Collectors.toList());
+        return requests;
     }
 
-    @Override
-    public void clearOutputs() {
-        requests.clear();
-    }
-
-
-    private XBuffer toXBuffer(Request request) {
-        XBuffer xBuffer = new XBuffer();
-        xBuffer.cache(request.getContent());
-        xBuffer.setxSocketId(request.getSocketId());
-        return xBuffer;
-    }
 }

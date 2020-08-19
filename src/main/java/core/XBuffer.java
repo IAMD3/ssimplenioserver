@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class XBuffer {
 
-
     /**
      * associated XSocketId
      */
@@ -126,9 +125,6 @@ public class XBuffer {
         content = desc;
         this.length = length;
     }
-
-
-
 
 
     public String getxSocketId() {

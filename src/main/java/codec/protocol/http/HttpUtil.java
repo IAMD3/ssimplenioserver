@@ -23,7 +23,7 @@ public class HttpUtil {
     private static final byte[] CONTENT_LENGTH = new byte[]{'C', 'o', 'n', 't', 'e', 'n', 't', '-', 'L', 'e', 'n', 'g', 't', 'h'};
 
     public static Request tryToParseHttpRequest(XBuffer readerBuffer) throws IOException {
-        if(readerBuffer.getLength() ==0){
+        if (readerBuffer.getLength() == 0) {
             return null;
         }
 
@@ -56,11 +56,11 @@ public class HttpUtil {
         if (content_length == 0) {
             //return a request without body
             Request request = new Request();
-            request.setSocketId(readerBuffer.getxSocketId())
-                    .setContent(content)
-                    .setRequestLineOffset(0)
-                    .setHeadersOffset(request_line_end_index + 1)
-                    .setBodyOffset(-1);
+            request.setxSocketId(readerBuffer.getxSocketId());
+            request.setContent(content);
+            request.setHeadersOffset(request_line_end_index + 1);
+            request.setBodyOffset(-1);
+            request.setLength(content.length);
             //clear all data of readerBuffer;
             readerBuffer.reset();
             return request;
@@ -74,11 +74,12 @@ public class HttpUtil {
             // rare but perfect condition
             Request request = new Request();
 
-            request.setSocketId(readerBuffer.getxSocketId())
-                    .setContent(content)
-                    .setRequestLineOffset(0)
-                    .setHeadersOffset(request_line_end_index + 1)
-                    .setBodyOffset(body_start_index);
+            request.setxSocketId(readerBuffer.getxSocketId());
+            request.setContent(content);
+            request.setHeadersOffset(request_line_end_index + 1);
+            request.setBodyOffset(body_start_index);
+            request.setLength(content.length);
+
             //clear all data of readerBuffer;
             readerBuffer.reset();
             return request;
@@ -89,12 +90,11 @@ public class HttpUtil {
             byte[] request_content = new byte[body_end_index];
             System.arraycopy(content, 0, request_content, 0, body_end_index);
 
-            request.setSocketId(readerBuffer.getxSocketId())
-                    .setContent(request_content)
-                    .setRequestLineOffset(0)
-                    .setHeadersOffset(request_line_end_index + 1)
-                    .setBodyOffset(body_start_index);
-
+            request.setxSocketId(readerBuffer.getxSocketId());
+            request.setContent(request_content);
+            request.setHeadersOffset(request_line_end_index + 1);
+            request.setBodyOffset(body_start_index);
+            request.setLength(content.length);
             // remain the rest part of buffer
             int offset = body_end_index + 1;
             readerBuffer.trim(offset, readerBuffer.getLength() - offset);

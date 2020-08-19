@@ -10,7 +10,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: Yukai
@@ -111,8 +110,8 @@ public class XWorker implements Runnable {
                                 .map(handler::handle)
                                 .forEach(Container.OUTBOUND_QUEUE::offer);
 
-                        xSocket.getxParser()
-                                .clearOutputs();
+                        completeMsgBufferBlocks.clear();
+
                     }
                 }
 

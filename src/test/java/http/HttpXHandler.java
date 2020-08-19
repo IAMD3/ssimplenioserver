@@ -22,9 +22,12 @@ public class HttpXHandler implements XHandler {
     @Override
     public XBuffer handle(XBuffer reqBuffer) {
 
-        System.err.println(" requests received from one NIO reading");
-        System.err.println(new String(reqBuffer.getContent()));
-        XBuffer resp = resp((Request) reqBuffer);
+        Request request = (Request) reqBuffer;
+
+        System.err.println("requests received from one NIO reading:");
+        System.err.println("request parameters map: "+request.tryGetUriParams());
+        System.err.println("full request:"+new String(reqBuffer.getContent()));
+        XBuffer resp = resp(request);
 
         return resp;
     }
